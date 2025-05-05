@@ -1,0 +1,25 @@
+env: dev
+version: 1.0.0
+
+logger:
+  level: debug
+
+service:
+  port: 8080
+  readTimeout: 60
+  writeTimeout: 60
+
+database:
+  host: db
+  port: 3306
+  user: user
+  password: password
+  name: recommendation
+
+cache:
+  host: cache
+  port: 6379
+  password: password
+  db: 0
+
+jwtSecret: secret

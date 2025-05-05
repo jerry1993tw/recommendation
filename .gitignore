@@ -1,0 +1,32 @@
+# Go build output
+/main
+*.out
+*.exe
+*.test
+
+# Go workspace artifacts
+bin/
+vendor/
+
+# Logs
+*.log
+
+# Config / Secrets
+config.yaml
+.env
+
+# IDE / Editor settings
+.vscode/
+.idea/
+.DS_Store
+
+# System files
+Thumbs.db
+ehthumbs.db
+
+# Docker
+.dockerignore
+
+# Git
+*.swp
+*.swo
