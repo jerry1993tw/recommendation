@@ -198,7 +198,7 @@ go run cmd/main.go
 ```
 
 ### 取得推薦商品
-- **GET /recommendation**：需帶入 Bearer Token
+- **GET /recommendations**：需帶入 Bearer Token
 
 ```http
 Authorization: Bearer <your-token>
