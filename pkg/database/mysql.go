@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -10,23 +11,22 @@ import (
 
 var db *gorm.DB
 
-func InitDB(dsn string) {
+func InitDB(dsn string) (*gorm.DB, error) {
 	var err error
-	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("Error connecting to database: %v", err)
+	maxRetries := 10
+
+	for i := 1; i <= maxRetries; i++ {
+		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		if err == nil {
+			log.Printf("[database] Connected to MySQL successfully (attempt %d)\n", i)
+			return db, nil
+		}
+
+		log.Printf("[database] Failed to connect to MySQL (attempt %d/%d): %v", i, maxRetries, err)
+		time.Sleep(2 * time.Second)
 	}
 
-	sqlDB, err := db.DB()
-	if err != nil {
-		log.Fatalf("Error accessing underlying sql.DB: %v", err)
-	}
-
-	if err = sqlDB.Ping(); err != nil {
-		log.Fatalf("Error pinging database: %v", err)
-	}
-
-	fmt.Println("Connected to MySQL database successfully!")
+	return nil, fmt.Errorf("failed to connect to MySQL after %d attempts: %w", maxRetries, err)
 }
 
 func GetDB() *gorm.DB {

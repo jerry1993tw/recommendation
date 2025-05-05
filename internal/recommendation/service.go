@@ -1,6 +1,7 @@
 package recommendation
 
 import (
+	"app/pkg/logger"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -12,12 +13,14 @@ import (
 type RecommendationService struct {
 	recommendationRepo *Repository
 	redisClient        *redis.Client
+	log                *logger.Logger
 }
 
-func NewRecommendationService(recommendationRepo *Repository, redisClient *redis.Client) *RecommendationService {
+func NewRecommendationService(recommendationRepo *Repository, redisClient *redis.Client, log *logger.Logger) *RecommendationService {
 	return &RecommendationService{
 		recommendationRepo: recommendationRepo,
 		redisClient:        redisClient,
+		log:                log,
 	}
 }
 
@@ -35,16 +38,19 @@ func (s *RecommendationService) GetRecommendations(ctx context.Context, userID u
 	time.Sleep(3 * time.Second)
 	recommendations, err = s.recommendationRepo.GetAllRecommendations()
 	if err != nil {
+		s.log.WithError(err).Error("Failed to get recommendations from database")
 		return nil, err
 	}
 
 	cacheValue, err := json.Marshal(recommendations)
 	if err != nil {
+		s.log.WithError(err).Error("Failed to marshal recommendations for caching")
 		return nil, err
 	}
 
 	err = s.redisClient.Set(ctx, cacheKey, cacheValue, 10*time.Minute).Err()
 	if err != nil {
+		s.log.WithError(err).Error("Failed to set recommendations in cache")
 		return nil, err
 	}
 

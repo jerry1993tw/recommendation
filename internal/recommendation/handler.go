@@ -3,15 +3,21 @@ package recommendation
 import (
 	"net/http"
 
+	"app/pkg/logger"
+
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
 	service *RecommendationService
+	log     *logger.Logger
 }
 
-func NewHandler(service *RecommendationService) *Handler {
-	return &Handler{service: service}
+func NewHandler(service *RecommendationService, log *logger.Logger) *Handler {
+	return &Handler{
+		service: service,
+		log:     log,
+	}
 }
 
 func (h *Handler) GetRecommendations(c *gin.Context) {

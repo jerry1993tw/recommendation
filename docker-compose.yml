@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: app
     depends_on:
       - mysql
@@ -10,9 +12,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - .:/app
-    environment:
-      CONFIG_PATH: config/config.yaml
+      - ./config:/app/config:ro
     restart: unless-stopped
 
   mysql:

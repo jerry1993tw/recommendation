@@ -50,7 +50,7 @@ recommendation
 │   ├── logger
 │   │   └── logger.go          # logger 初始化
 │   └── utils
-│       └── password.go        # 密碼加密與驗證工具
+│       └── encrypt.go        # 密碼加密與驗證工具
 ├── go.mod                     # Go 模組定義
 ├── go.sum                     # 相依套件版本資訊
 └── README.md                  # 專案說明文件

@@ -28,9 +28,16 @@ func main() {
 	database.InitDB(dsn)
 	dbConn := database.GetDB()
 
+	log.Info("Running database migrations")
+	if err := database.AutoMigrate(dbConn); err != nil {
+		log.WithError(err).Error("Failed to run database migrations")
+		return
+	}
+
 	log.Info("Initializing Redis client")
 	redisClient := cache.NewRedisClient(
 		config.New().Cache.Host,
+		config.New().Cache.Port,
 		config.New().Cache.Password,
 		config.New().Cache.DB,
 	)

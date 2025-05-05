@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"app/internal/config"
@@ -32,7 +33,14 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("userID", claims.Subject)
+		userID, err := strconv.ParseUint(claims.Subject, 10, 64)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID"})
+			c.Abort()
+			return
+		}
+
+		c.Set("userID", uint(userID))
 		c.Next()
 	}
 }

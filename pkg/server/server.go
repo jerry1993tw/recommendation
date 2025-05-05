@@ -15,6 +15,7 @@ import (
 	"app/internal/recommendation"
 	"app/internal/user"
 	"app/pkg/email"
+	"app/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -76,19 +77,21 @@ func InitRouter() *gin.Engine {
 	e.Use(gin.Logger())
 	e.Use(gin.Recovery())
 
+	log := logger.New()
+
 	userRepo := user.NewRepository(dbConn)
 	emailService := &email.MockEmailService{}
-	authService := auth.NewService(userRepo, emailService)
-	authHandler := auth.NewHandler(authService)
+	authService := auth.NewService(userRepo, emailService, log)
+	authHandler := auth.NewHandler(authService, log)
 
 	recommendationRepo := recommendation.NewRepository(dbConn)
-	recommendationService := recommendation.NewRecommendationService(recommendationRepo, redisClient)
-	recommendationHandler := recommendation.NewHandler(recommendationService)
+	recommendationService := recommendation.NewRecommendationService(recommendationRepo, redisClient, log)
+	recommendationHandler := recommendation.NewHandler(recommendationService, log)
 
 	e.POST("/register", authHandler.Register)
 	e.POST("/verify", authHandler.VerifyEmail)
 	e.POST("/login", authHandler.Login)
-	e.GET("/recommendation", middleware.AuthMiddleware(), recommendationHandler.GetRecommendations)
+	e.GET("/recommendations", middleware.AuthMiddleware(), recommendationHandler.GetRecommendations)
 
 	return e
 }
